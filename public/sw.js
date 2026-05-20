@@ -9,7 +9,7 @@
 //
 // Cache 名带版本, 升级 SW 时旧 cache 自动 unregister + 清掉.
 
-const VERSION = "v53-2026-05-21a"; // v0.15 · backstage IA reshuffle (/backstage/settings + /character) · favicon + tight apple-touch-icon · 他 labels
+const VERSION = "v54-2026-05-21b"; // v0.17 · git author email fix to marikagura · v0.10-0.16 build unblock
 
 const APP_SHELL_CACHE = `kimi-shell-${VERSION}`;
 const RUNTIME_CACHE = `kimi-runtime-${VERSION}`;
