@@ -9,7 +9,7 @@
 //
 // Cache 名带版本, 升级 SW 时旧 cache 自动 unregister + 清掉.
 
-const VERSION = "v52-2026-05-19h"; // v2 Heartbeat · sky 50 slot memory + score 30-day pulse · Backstage → Heartbeat Module I
+const VERSION = "v53-2026-05-21a"; // v0.15 · backstage IA reshuffle (/backstage/settings + /character) · favicon + tight apple-touch-icon · 他 labels
 
 const APP_SHELL_CACHE = `kimi-shell-${VERSION}`;
 const RUNTIME_CACHE = `kimi-runtime-${VERSION}`;
