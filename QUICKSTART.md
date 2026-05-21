@@ -18,6 +18,16 @@
 
 iPhone 上想加到主屏幕? Safari 打开 `xxx.vercel.app` → 分享 → 加到主屏幕 → 全屏 PWA.
 
+## 备选: 一键 Netlify
+
+Vercel 那个手机号 verification 卡住 / 不想给手机号 → 换 Netlify, 同一份代码, 一般 GitHub OAuth 直接过.
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/marikagura/kimi-room)
+
+点按钮 → GitHub 登录 → 自动 fork + build · 几分钟后拿到 `xxx.netlify.app` 网址.
+
+PWA 装到主屏幕 · 数据存哪 · 一切都跟 Vercel 那一节一样.
+
 ## 配置 LLM (可选)
 
 进网站后点右下角 `settings`, 填:
