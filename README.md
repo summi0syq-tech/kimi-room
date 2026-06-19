@@ -67,6 +67,7 @@ RAG 与 redirect 的区分见 **[docs/BACKENDS.md](docs/BACKENDS.md)**。
 | **Calendar** | 手动输入 + 本地存储 | 接任何日历 API（不限 Google）。wellbeing 数据可以从 app 使用记录自动采集 |
 | **Memory** | 本地 IndexedDB | 接你的 DB。审核流程可改可删 |
 | **Disc** | 本地对话截图 + 歌单 | 归档到云 |
+| **Atlas** (addon · 旅行册) | 一份静态 demo 旅行数据 · 铁艺拱窗开窗看图 | 接你自己的来源（DB / MDX / API），`imageUrl` 换成真图；不想要在 /settings 收起 |
 | **Backstage** | 固定 /ops 页面 | 加任何你想要的 ops 面板 |
 | **所有 manual 输入** | 手动填 | 全部可以用自动化替代。蜡烛可以用 app_open，睡眠可以用传感器，财务可以接银行 API |
 | **Character / RP 功能** | 有 /settings 里的角色设定 | 不想要可以整个删。告诉你的 AI "帮我删掉所有 character 和 RP 相关功能" |
@@ -140,7 +141,7 @@ public/images/
 
 美术（手绘金线 SVG / PNG，狐狸 · 玫瑰那套）：[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)，署名 + 非商用；`entry-motion` 品牌标识保留、请替换。第三方氛围图与字体见 [NOTICE.md](NOTICE.md)。
 
-详细文档 → [manua](https://kimi-to.com/about/wiki)
+详细文档 → [manual](https://kimi-to.com/about/wiki)
 
 ## Images
 

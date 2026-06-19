@@ -74,6 +74,7 @@ deleted. Hand this section, plus what you want changed, to your AI:
 | **Calendar** | manual input + local storage | any calendar API (not just Google). Wellbeing data can be auto-collected from app usage |
 | **Memory** | local IndexedDB | your DB. Review flow editable or removable |
 | **Disc** | local chat screenshots + playlist | archive to cloud |
+| **Atlas** (addon · travel log) | one static demo trip · iron-tracery window opens to reveal the image | wire your own source (DB / MDX / API), set `imageUrl` to a real image; or tuck it away in /settings |
 | **Backstage** | fixed /ops page | add any ops panel you want |
 | **All manual inputs** | hand-filled | all replaceable with automation. Candles via app_open, sleep via sensors, finance via bank API |
 | **Character / RP features** | character config in /settings | deletable wholesale. Tell your AI "remove all character and RP features" |
@@ -153,7 +154,7 @@ Artwork (the hand-drawn gold-line SVG / PNG — fox, roses, …):
 non-commercial; `entry-motion` is a brand mark, reserved — replace it. Third-party
 ambient images and fonts are covered in [NOTICE.md](NOTICE.md).
 
-Full docs → [wiki](https://kimi-to.com/about/wiki) · [FAQ](https://kimi-to.com/about/faq)
+Full docs → [manual](https://kimi-to.com/about/wiki)
 
 ## Images
 
