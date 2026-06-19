@@ -39,7 +39,9 @@ OFL 1.1 permits redistribution; bundled here per `kimi-fonts.css` @font-face dec
 
 ## `public/icons/` — rose + fox SVG / PNG (41 file)
 
-**Source**: canon V1 design assets · hand-traced / rendered for kimi-room visual system. Released here under the repository's AGPL v3 license alongside the source code.
+**Source**: hand-drawn for the kimi-room visual system, © 2026 marikagura.
+
+**License**: [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) (attribution + non-commercial) — licensed separately from the AGPL code. Free to use and adapt for non-commercial purposes with attribution; no commercial use. Exception: `entry-motion` / the icon brand marks (see below) are reserved.
 
 ---
 

@@ -8,8 +8,8 @@
 
 a room for one person and her other one.
 
-开源 companion PWA。六个房间。数据在你浏览器里。
-不需要服务器、不需要域名、不收集任何数据。AGPL v3。
+开源 companion PWA。六个房间，可以自己搭——每块是一个 addon（积木），在 `/backstage/settings` 勾哪六个上首页、其余落底部（见 [ADDONS.md](ADDONS.md)）；已内置 **Atlas**。数据在你浏览器里。
+不需要服务器、不需要域名、不收集任何数据。代码 AGPL v3，美术 CC BY-NC。
 
 > **只想用？** → [QUICKSTART.md](QUICKSTART.md) · 5 分钟 · 一键部署
 > **想改？** 把这个 README 整个丢给你的 AI，它会帮你。
@@ -134,7 +134,11 @@ public/images/
 
 ## License
 
-AGPL v3 — fork 随意，闭源不行。
+代码：[AGPL v3](LICENSE) © 2026 marikagura。开源——clone / fork / 改 / 自托管都行，衍生和联网服务需**继续开源**（copyleft）。
+
+**请勿商用。** 作者不希望这套被商业化（出售、做成付费服务）；要商用请先联系。
+
+美术（手绘金线 SVG / PNG，狐狸 · 玫瑰那套）：[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)，署名 + 非商用；`entry-motion` 品牌标识保留、请替换。第三方氛围图与字体见 [NOTICE.md](NOTICE.md)。
 
 详细文档 → [wiki](https://kimi-to.com/about/wiki) · [FAQ](https://kimi-to.com/about/faq)
 

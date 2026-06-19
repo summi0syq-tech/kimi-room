@@ -8,8 +8,11 @@
 
 a room for one person and her other one.
 
-An open-source companion PWA. Six rooms. Your data lives in your browser.
-No server, no domain, no data collection. AGPL v3.
+An open-source companion PWA. Six rooms — assemble them yourself: each is an
+addon (a building block); pick which six sit on the home grid in
+`/backstage/settings`, the rest fall to the bottom (see [ADDONS.en.md](ADDONS.en.md)).
+**Atlas** ships built-in. Your data lives in your browser. No server, no domain,
+no data collection. Code AGPL v3, artwork CC BY-NC.
 
 > **Just want to use it?** → [QUICKSTART.en.md](QUICKSTART.en.md) · 5 minutes · one-click deploy
 > **Want to change it?** Hand this whole README to your AI — it'll help.
@@ -139,7 +142,16 @@ public/images/
 
 ## License
 
-AGPL v3 — fork freely, no closed source.
+Code: [AGPL v3](LICENSE) © 2026 marikagura. Open source — clone / fork / modify /
+self-host freely; derivatives and network services must **stay open** (copyleft).
+
+**Please don't use it commercially.** The author would rather this not be
+commercialized (sold, run as a paid service); for commercial use, ask first.
+
+Artwork (the hand-drawn gold-line SVG / PNG — fox, roses, …):
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/), attribution +
+non-commercial; `entry-motion` is a brand mark, reserved — replace it. Third-party
+ambient images and fonts are covered in [NOTICE.md](NOTICE.md).
 
 Full docs → [wiki](https://kimi-to.com/about/wiki) · [FAQ](https://kimi-to.com/about/faq)
 
