@@ -11,13 +11,14 @@ import { loadGraphData } from "@/lib/graph-data";
 export const dynamic = "force-dynamic";
 
 export default async function GraphPage() {
-  const G = gothicFor(await getTheme());
+  const theme = await getTheme();
+  const G = gothicFor(theme);
   const data = await loadGraphData();
 
   return (
     <GothicPage G={G}>
       <div style={{ fontFamily: SCORE_FONT_BODY }}>
-        <GraphView G={G} data={data} />
+        <GraphView G={G} data={data} theme={theme} />
       </div>
     </GothicPage>
   );
