@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 // Pull-to-refresh for PWA standalone mode (iOS Safari doesn't supply native
 // PTR when display-mode is standalone). Listens on window scroll + touch:
@@ -12,12 +13,18 @@ const THRESHOLD = 70; // px finger drag to trigger refresh
 const MAX_PULL = 110;  // visual cap (no further movement past)
 
 export function PullToRefresh() {
+  const pathname = usePathname();
+  // /chat is a position:fixed full-screen layout, so the window never scrolls
+  // (window.scrollY stays 0) and PTR mis-detects "at top" on every touchstart —
+  // dragging to scroll the message log would trigger a reload. Disable PTR there.
+  const disabled = pathname?.startsWith("/chat") || false;
   const [pull, setPull] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef<number | null>(null);
   const armed = useRef(false);
 
   useEffect(() => {
+    if (disabled) return;
     function onTouchStart(e: TouchEvent) {
       // arm only if scrolled to top — otherwise allow normal scrolling
       if (window.scrollY > 0) {
@@ -66,7 +73,9 @@ export function PullToRefresh() {
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [pull, refreshing]);
+  }, [pull, refreshing, disabled]);
+
+  if (disabled) return null;
 
   const armed_ = pull >= THRESHOLD;
   return (

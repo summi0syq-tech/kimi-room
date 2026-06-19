@@ -18,9 +18,37 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-function currentMonthName(): string {
+// 自然月视图 · canon 0606 "月支出从滚动累计改自然月" 的 demo 版.
+// ?month=YYYY-MM, 默认本月 (JST). 月份 chip 选择器列最近 12 个自然月.
+function monthKey(y: number, m: number): string {
+  return `${y}-${String(m).padStart(2, "0")}`;
+}
+
+function currentJstYM(): { year: number; month: number } {
   const jst = new Date(Date.now() + 9 * 3600 * 1000);
-  return MONTH_NAMES[jst.getUTCMonth()];
+  return { year: jst.getUTCFullYear(), month: jst.getUTCMonth() + 1 };
+}
+
+function parseMonthParam(raw?: string): { year: number; month: number } {
+  const cur = currentJstYM();
+  const m = raw?.match(/^(\d{4})-(\d{2})$/);
+  if (!m) return cur;
+  const month = Number(m[2]);
+  if (month < 1 || month > 12) return cur;
+  return { year: Number(m[1]), month };
+}
+
+function monthOptions(): { key: string; label: string }[] {
+  const cur = currentJstYM();
+  const base = cur.year * 12 + (cur.month - 1);
+  const out: { key: string; label: string }[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const idx = base - i;
+    const y = Math.floor(idx / 12);
+    const m = (idx % 12) + 1;
+    out.push({ key: monthKey(y, m), label: MONTH_NAMES[m - 1].slice(0, 3) });
+  }
+  return out;
 }
 
 type Cat = { cat: string; amt: number; color: string };
@@ -48,7 +76,7 @@ function nightCats(): Cat[] {
 }
 
 type Envelope = {
-  kind: "bank" | "jpy" | "usd" | "cny";
+  kind: "bank" | "jpy" | "usd" | "cny" | "card";
   label: string;
   amount: string;
   count: number;
@@ -106,6 +134,49 @@ function mockEnvelopes(): Envelope[] {
         { date: "05/04", name: "礼物", amt: "¥220" },
         { date: "05/18", name: "网购", amt: "¥140" },
         { date: "05/22", name: "出行", amt: "¥80" },
+      ],
+    },
+  ];
+}
+
+// 卡 tab demo · by card · 全假数据 + 泛化卡名 (无真实卡号). canon 0606 第三 tab
+// "卡" 的 demo 版. fork 后接 own 交易按 card 聚合替换.
+function mockCards(): Envelope[] {
+  return [
+    {
+      kind: "card",
+      label: "Card · ••00",
+      amount: "¥4,820",
+      count: 4,
+      transactions: [
+        { date: "05/03", name: "网购", amt: "¥1,280" },
+        { date: "05/12", name: "外食", amt: "¥640" },
+        { date: "05/19", name: "订阅", amt: "¥1,200" },
+        { date: "05/26", name: "出行", amt: "¥1,700" },
+      ],
+    },
+    {
+      kind: "card",
+      label: "信用卡 · 自动扣款",
+      amount: "¥13,420",
+      count: 3,
+      transactions: [
+        { date: "05/01", name: "房租", amt: "¥12,800" },
+        { date: "05/12", name: "水电燃气", amt: "¥420" },
+        { date: "05/27", name: "宽带", amt: "¥200" },
+      ],
+    },
+    {
+      kind: "card",
+      label: "移动支付 · 日常",
+      amount: "¥1,540",
+      count: 5,
+      transactions: [
+        { date: "05/05", name: "便利店", amt: "¥180" },
+        { date: "05/09", name: "咖啡", amt: "¥48" },
+        { date: "05/15", name: "书店", amt: "¥320" },
+        { date: "05/21", name: "外食", amt: "¥492" },
+        { date: "05/28", name: "打车", amt: "¥500" },
       ],
     },
   ];
@@ -325,7 +396,15 @@ function Stamp({ kind, isDay, index }: { kind: Envelope["kind"]; isDay: boolean;
         }}
       >
         <span data-env-i={index} data-env-field="kind">
-          {kind === "bank" ? "BANK" : kind === "jpy" ? "JPY" : kind === "usd" ? "USD" : "CNY"}
+          {kind === "bank"
+            ? "BANK"
+            : kind === "jpy"
+              ? "JPY"
+              : kind === "usd"
+                ? "USD"
+                : kind === "card"
+                  ? "CARD"
+                  : "CNY"}
         </span>
       </div>
     </div>
@@ -539,10 +618,85 @@ function FlowerIcon({ size = 16, color }: { size?: number; color: string }) {
   );
 }
 
+// 信用卡 icon · canon CardIcon port (第三 tab 卡).
+function CardIcon({ size = 16, color }: { size?: number; color: string }) {
+  return (
+    <svg width={size} height={(size * 10) / 16} viewBox="0 0 16 10" aria-hidden>
+      <rect x="1" y="1" width="14" height="8" rx="1" fill="none" stroke={color} strokeWidth="0.9" />
+      <rect x="1.5" y="3" width="13" height="1.4" fill={color} opacity="0.6" />
+      <rect x="9" y="6.4" width="5" height="1.2" fill="none" stroke={color} strokeWidth="0.5" />
+    </svg>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
-// Tab bar (信 / 园, no 年)
+// Month selector — 自然月切换 chip 行 (canon MonthSelector port)
 // ─────────────────────────────────────────────────────────────
-function TabBar({ active, isDay }: { active: "envelope" | "garden"; isDay: boolean }) {
+function MonthSelector({
+  options,
+  selectedKey,
+  tab,
+  isDay,
+}: {
+  options: { key: string; label: string }[];
+  selectedKey: string;
+  tab: "envelope" | "garden" | "card";
+  isDay: boolean;
+}) {
+  const accent = isDay ? "#A42B5E" : "#b8a070";
+  const mute = isDay ? "rgba(26,14,10,0.5)" : "rgba(232,230,224,0.45)";
+  const hair = isDay ? "rgba(106,74,72,0.28)" : "rgba(184,160,112,0.2)";
+  const activeBg = isDay ? "rgba(164,43,94,0.1)" : "rgba(184,160,112,0.14)";
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        gap: 6,
+        marginTop: 16,
+        padding: "0 12px",
+      }}
+    >
+      {options.map((o) => {
+        const isActive = o.key === selectedKey;
+        return (
+          <Link
+            key={o.key}
+            href={`/room/calendar/finance?tab=${tab}&month=${o.key}`}
+            style={{
+              padding: "4px 12px",
+              borderRadius: 100,
+              border: `0.5px solid ${isActive ? accent : hair}`,
+              background: isActive ? activeBg : "transparent",
+              color: isActive ? accent : mute,
+              fontFamily: '"Cormorant Garamond", serif',
+              fontStyle: "italic",
+              fontSize: 12,
+              letterSpacing: 1,
+              textDecoration: "none",
+            }}
+          >
+            {o.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tab bar (信 / 园 / 卡)
+// ─────────────────────────────────────────────────────────────
+function TabBar({
+  active,
+  monthKey: mKey,
+  isDay,
+}: {
+  active: "envelope" | "garden" | "card";
+  monthKey: string;
+  isDay: boolean;
+}) {
   const accent = isDay ? "#A42B5E" : "#b8a070";
   const mute = isDay ? "rgba(26,14,10,0.55)" : "rgba(232,230,224,0.5)";
   const hair = isDay ? "rgba(106,74,72,0.32)" : "rgba(184,160,112,0.22)";
@@ -553,14 +707,20 @@ function TabBar({ active, isDay }: { active: "envelope" | "garden"; isDay: boole
     {
       key: "envelope" as const,
       label: "信",
-      href: "/room/calendar/finance?tab=envelope",
+      href: `/room/calendar/finance?tab=envelope&month=${mKey}`,
       Icon: EnvelopeIcon,
     },
     {
       key: "garden" as const,
       label: "园",
-      href: "/room/calendar/finance?tab=garden",
+      href: `/room/calendar/finance?tab=garden&month=${mKey}`,
       Icon: FlowerIcon,
+    },
+    {
+      key: "card" as const,
+      label: "卡",
+      href: `/room/calendar/finance?tab=card&month=${mKey}`,
+      Icon: CardIcon,
     },
   ];
 
@@ -570,7 +730,7 @@ function TabBar({ active, isDay }: { active: "envelope" | "garden"; isDay: boole
         position: "sticky",
         bottom: 16,
         margin: "32px auto 24px",
-        maxWidth: 280,
+        maxWidth: 340,
         height: 46,
         background: bg,
         backdropFilter: "blur(10px)",
@@ -622,11 +782,20 @@ function TabBar({ active, isDay }: { active: "envelope" | "garden"; isDay: boole
 export default async function FinancePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ tab?: string }>;
+  searchParams?: Promise<{ tab?: string; month?: string }>;
 }) {
   // V2 strip canon backstage cookie auth gate · 0 web auth per owner 0429 ack.
   const params = (await searchParams) ?? {};
-  const tab: "envelope" | "garden" = params.tab === "envelope" ? "envelope" : "garden";
+  const tab: "envelope" | "garden" | "card" =
+    params.tab === "envelope"
+      ? "envelope"
+      : params.tab === "card"
+        ? "card"
+        : "garden";
+  const sel = parseMonthParam(params.month);
+  const selKey = monthKey(sel.year, sel.month);
+  const monthName = MONTH_NAMES[sel.month - 1];
+  const months = monthOptions();
 
   const theme = await getTheme();
   const isDay = theme === "day";
@@ -634,6 +803,7 @@ export default async function FinancePage({
   const moon = getMoonPhase();
   const cats = isDay ? dayCats() : nightCats();
   const envelopes = mockEnvelopes();
+  const cards = mockCards();
 
   // V2 finance edit overlay seed · owner 0518: tap-edit (minimal v1 = ✎ button
   // → modal edits all roses + envelopes · localStorage persist + reload apply).
@@ -647,7 +817,7 @@ export default async function FinancePage({
 
   return (
     <KimiPage P={P} vines={false}>
-      <KimiTopNav title="FINANCE" sub="month" P={P} backHref="/room/calendar" />
+      <KimiTopNav title="FINANCE" sub={`${monthName.slice(0, 3)} ${sel.year}`} P={P} backHref="/room/calendar" />
       <FinanceLocalOverride />
       <FinanceEditOverlay P={P} seedCats={overlayCats} seedEnvelopes={overlayEnvs} />
 
@@ -663,9 +833,12 @@ export default async function FinancePage({
             lineHeight: 1,
           }}
         >
-          {currentMonthName()}
+          {monthName}
         </div>
       </div>
+
+      {/* month selector — 自然月切换 (canon 0606) */}
+      <MonthSelector options={months} selectedKey={selKey} tab={tab} isDay={isDay} />
 
       {/* moon backdrop only on garden tab */}
       {tab === "garden" && (
@@ -685,10 +858,16 @@ export default async function FinancePage({
         <div style={{ marginTop: 12, padding: "0 8px" }}>
           <StandingRoseGarden data={cats} w={360} h={360} isDay={isDay} />
         </div>
-      ) : (
+      ) : tab === "envelope" ? (
         <div style={{ marginTop: 28, padding: "0 18px", maxWidth: 440, margin: "28px auto 0" }}>
           {envelopes.map((env, i) => (
             <EnvelopeCard key={`${env.kind}-${i}`} env={env} isDay={isDay} index={i} />
+          ))}
+        </div>
+      ) : (
+        <div style={{ marginTop: 28, padding: "0 18px", maxWidth: 440, margin: "28px auto 0" }}>
+          {cards.map((env, i) => (
+            <EnvelopeCard key={`${env.label}-${i}`} env={env} isDay={isDay} index={i} />
           ))}
         </div>
       )}
@@ -717,7 +896,7 @@ export default async function FinancePage({
       </div>
 
       {/* tab bar */}
-      <TabBar active={tab} isDay={isDay} />
+      <TabBar active={tab} monthKey={selKey} isDay={isDay} />
     </KimiPage>
   );
 }

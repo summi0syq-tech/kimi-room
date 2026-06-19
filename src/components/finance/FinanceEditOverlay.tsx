@@ -11,7 +11,7 @@ import type { KimiPalette } from "@/lib/kimi-palettes";
 
 export type EditableCat = { cat: string; amt: number; color: string };
 export type EditableEnvelope = {
-  kind: "bank" | "jpy" | "usd" | "cny";
+  kind: "bank" | "jpy" | "usd" | "cny" | "card";
   label: string;
   amount: string;
 };

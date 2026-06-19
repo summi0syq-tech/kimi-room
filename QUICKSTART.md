@@ -1,3 +1,5 @@
+> English: ./QUICKSTART.en.md
+
 # kimi-room · 5 分钟跑起来
 
 ![license](https://img.shields.io/badge/license-AGPL%20v3-b13a5a?style=flat-square)

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Glass } from "@/components/mucha/Glass";
 import { GothicPage, RoseBud } from "@/components/mucha/Gothic";
@@ -56,7 +57,7 @@ export default function WellbeingPage() {
             fontStyle: "italic",
           }}
         >
-          her body
+          the body
         </div>
         <div
           style={{
@@ -113,6 +114,24 @@ export default function WellbeingPage() {
               : `${lastLabel} · ${lastDur} 小时`}
           </div>
         </Glass>
+      </div>
+
+      {/* sample dashboard 入口 — 演示如何加一块 report */}
+      <div style={{ textAlign: "center", marginTop: 18 }}>
+        <Link
+          href="/room/wellbeing/report"
+          style={{
+            fontSize: 12,
+            letterSpacing: 3,
+            color: G.accent,
+            fontStyle: "italic",
+            fontFamily: "Cormorant Garamond, serif",
+            textDecoration: "none",
+            opacity: 0.85,
+          }}
+        >
+          示例报告 · sample report →
+        </Link>
       </div>
     </GothicPage>
   );

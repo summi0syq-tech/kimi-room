@@ -1,3 +1,5 @@
+> English: ./ADDONS.en.md
+
 # Addons
 
 首页永远是**六个房间**。第七个、第八个……不挤进格子——它们是 **addon**，

@@ -1,3 +1,5 @@
+> English: ./README.en.md
+
 # kimi-room
 
 ![license](https://img.shields.io/badge/license-AGPL%20v3-b13a5a?style=flat-square)
@@ -39,8 +41,12 @@ src/lib/stores/index.ts        ← 切 adapter 的地方
 Supabase / Postgres / Obsidian / Notion / Ombre-brain 任何 DB。
 接口在 `types.ts` 里全定义好了。
 
-你还需要自己搭：
-- **Gateway**（VPS 上跑的 API server，接 TG bot / LLM proxy / MCP）
+作者将该**记忆引擎**开源为 **[kimi-core](https://github.com/marikagura/kimi-core)**。
+运行后设 `NEXT_PUBLIC_KIMI_BACKEND=core` + `KIMI_CORE_URL` + `KIMI_API_KEY`，
+房间即 redirect 到它作为记忆引擎；聊天模型仍走你自己的官方订阅 / API，二者可组合。
+RAG 与 redirect 的区分见 **[docs/BACKENDS.md](docs/BACKENDS.md)**。
+
+此外通常还需自行搭建：
 - **自主循环**（dream / intel / scheduler — 让系统自己醒来、自己处理邮件、自己写日记）
 - **域名**（Vercel 自带 .vercel.app，自定义域名在 dashboard 设）
 

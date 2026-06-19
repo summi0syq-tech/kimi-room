@@ -37,15 +37,39 @@ function jstHour(iso: string): number {
   return jst.getUTCHours();
 }
 
-function last30Days(): string[] {
-  const out: string[] = [];
+// 往月查看 · canon ScoreSheet TitleBlock 的 ?m=YYYY-MM mirror, V2 客户端 state 版.
+const MONTH_EN = [
+  "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+  "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER",
+];
+
+function currentYm(): string {
   const now = new Date();
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * 86400000);
-    const jst = new Date(d.getTime() + 9 * 3600 * 1000);
-    out.push(jst.toISOString().slice(0, 10));
+  const jst = new Date(now.getTime() + 9 * 3600 * 1000);
+  return jst.toISOString().slice(0, 7); // YYYY-MM (JST)
+}
+
+function monthDays(ym: string): string[] {
+  const [y, m] = ym.split("-").map(Number);
+  const last = new Date(Date.UTC(y, m, 0)).getUTCDate(); // m 是 1-based → 当月最后一天
+  const out: string[] = [];
+  for (let d = 1; d <= last; d++) {
+    out.push(`${ym}-${String(d).padStart(2, "0")}`);
   }
   return out;
+}
+
+function ymShift(ym: string, delta: number): string {
+  const [y, m] = ym.split("-").map(Number);
+  const idx = y * 12 + (m - 1) + delta;
+  const ny = Math.floor(idx / 12);
+  const nm = (idx % 12) + 1;
+  return `${ny}-${String(nm).padStart(2, "0")}`;
+}
+
+function monthLabelEN(ym: string): string {
+  const [y, m] = ym.split("-").map(Number);
+  return `${MONTH_EN[m - 1]} ${y}`;
 }
 
 function yForArousal(a: number, top: number): number {
@@ -62,9 +86,12 @@ export function ScoreSheet({
   data: HeartbeatData;
   onChange: () => Promise<void>;
 }) {
-  const days = last30Days();
-  const firstHalf = days.slice(0, 15);
-  const secondHalf = days.slice(15);
+  const [month, setMonth] = useState(currentYm());
+  const days = monthDays(month);
+  const half = Math.ceil(days.length / 2);
+  const firstHalf = days.slice(0, half);
+  const secondHalf = days.slice(half);
+  const canNext = month < currentYm();
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState<PulseEntry | null>(null);
@@ -79,7 +106,7 @@ export function ScoreSheet({
     }
     setBusy(true);
     try {
-      const todayKey = days[days.length - 1];
+      const todayKey = jstDayKey(new Date().toISOString());
       const todayPulses = pulsesByDay.get(todayKey) ?? [];
       const todayChats = data.pulses.filter(
         (p) => p.kind === "chat" && jstDayKey(p.at) === todayKey,
@@ -120,6 +147,13 @@ export function ScoreSheet({
 
   return (
     <div style={{ padding: "0 4px" }}>
+      <MonthNav
+        G={G}
+        ym={month}
+        canNext={canNext}
+        onPrev={() => setMonth(ymShift(month, -1))}
+        onNext={() => setMonth(ymShift(month, 1))}
+      />
       <Staff
         days={firstHalf}
         pulsesByDay={pulsesByDay}
@@ -647,6 +681,66 @@ function PulseForm({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 月切换 nav · canon ScoreSheet TitleBlock 的客户端版 (Link?m= → button onClick).
+// 已是当月 → 下一月灰掉占位 (canon 同行为).
+function MonthNav({
+  G,
+  ym,
+  canNext,
+  onPrev,
+  onNext,
+}: {
+  G: typeof GOTHIC;
+  ym: string;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  const arrow = (dir: "‹" | "›", enabled: boolean, onClick: () => void) =>
+    enabled ? (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={dir === "‹" ? "上一月" : "下一月"}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: G.mute,
+          cursor: "pointer",
+          fontFamily: "inherit",
+          fontSize: 13,
+          padding: "0 9px",
+          opacity: 0.7,
+        }}
+      >
+        {dir}
+      </button>
+    ) : (
+      <span style={{ color: G.mute, fontSize: 13, padding: "0 9px", opacity: 0.18 }}>
+        {dir}
+      </span>
+    );
+  return (
+    <div
+      style={{
+        marginTop: 2,
+        marginBottom: 10,
+        color: G.mute,
+        fontSize: 10,
+        letterSpacing: 4,
+        fontStyle: "italic",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {arrow("‹", true, onPrev)}
+      <span>OPUS {monthLabelEN(ym)} · ANDANTE</span>
+      {arrow("›", canNext, onNext)}
     </div>
   );
 }
