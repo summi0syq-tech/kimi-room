@@ -393,21 +393,27 @@ export function GraphView({ G, data, theme }: { G: typeof GOTHIC; data: GraphDat
       const tint = c.createLinearGradient(cx - halfW, domeTopY, cx + halfW, baseY);
       tint.addColorStop(0, hexA(Th.glass, dk ? 0.05 : 0.10)); tint.addColorStop(0.5, hexA(Th.glass, 0));
       c.fillStyle = tint; c.fill(); c.restore();
-      // refraction caustic
+      // refraction caustic — a soft radial glow centred at the shoulder. (Was a
+      // diagonal linear gradient painted into a fillRect: in night mode its top
+      // rect edge cut a hard horizontal line, because the gradient wasn't 0 there.
+      // A radial that fades to nothing has no rect/diagonal seam.)
       c.save(); c.globalCompositeOperation = dk ? "lighter" : "source-over";
       bodyPath(halfW, footY, shoulderY, domeTopY, neckW); c.clip();
-      const caustic = c.createLinearGradient(cx - halfW, shoulderY - M * 0.05, cx + halfW, shoulderY + M * 0.10);
-      caustic.addColorStop(0, hexA(Th.glass, 0)); caustic.addColorStop(0.5, hexA(Th.glass, dk ? 0.07 : 0.10)); caustic.addColorStop(1, hexA(Th.glass, 0));
-      c.fillStyle = caustic; c.fillRect(cx - halfW, shoulderY - M * 0.06, halfW * 2, M * 0.18); c.restore();
+      const caustic = c.createRadialGradient(cx, shoulderY + M * 0.01, 0, cx, shoulderY + M * 0.01, halfW * 1.15);
+      caustic.addColorStop(0, hexA(Th.glass, dk ? 0.06 : 0.10)); caustic.addColorStop(0.6, hexA(Th.glass, dk ? 0.02 : 0.04)); caustic.addColorStop(1, hexA(Th.glass, 0));
+      c.fillStyle = caustic; c.fillRect(cx - halfW, domeTopY, halfW * 2, baseY - domeTopY); c.restore();
       // glass outline (double)
       c.strokeStyle = gold(0.6); c.lineWidth = 1.3; c.lineJoin = "round"; bodyPath(halfW, footY, shoulderY, domeTopY, neckW); c.stroke();
       c.strokeStyle = gold(0.22); c.lineWidth = 0.6; bodyPath(halfW - 7, footY, shoulderY + 4, domeTopY + 8, neckW - 2); c.stroke();
-      // soft rim light pooled upper-left
+      // soft rim light pooled upper-left. fillRect spans the full dome width
+      // (halfW*2): the radial fades to 0 well before the right edge, so the pool
+      // tails off smoothly. (Was halfW-wide, cutting a hard vertical seam at x=cx
+      // where the gradient was still bright — very visible additively at night.)
       c.save(); c.globalCompositeOperation = dk ? "lighter" : "source-over";
       bodyPath(halfW, footY, shoulderY, domeTopY, neckW); c.clip();
       const rim = c.createRadialGradient(cx - halfW * 0.5, domeTopY + M * 0.10, 0, cx - halfW * 0.5, domeTopY + M * 0.10, M * 0.26);
       rim.addColorStop(0, hexA(Th.glass, dk ? 0.10 : 0.14)); rim.addColorStop(1, hexA(Th.glass, 0));
-      c.fillStyle = rim; c.fillRect(cx - halfW, domeTopY, halfW, M * 0.4); c.restore();
+      c.fillStyle = rim; c.fillRect(cx - halfW, domeTopY, halfW * 2, M * 0.4); c.restore();
       // crown finial + star
       const knobY = domeTopY - M * 0.028;
       c.strokeStyle = gold(0.6); c.lineWidth = 1.4; c.beginPath(); c.moveTo(cx, domeTopY - M * 0.004); c.lineTo(cx, knobY + 4); c.stroke();
