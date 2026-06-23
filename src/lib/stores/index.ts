@@ -1,20 +1,13 @@
-// V2 store entry-point · public hooks 6 module page 调.
-//
-// canon mode: 走 CanonPrismaAdapter (TODO Phase 3 · wrap existing prisma + lib/*-data.ts).
-// V2 mode:    走 IndexedDBAdapter (default), 后续 settings 切 NotionAdapter / SupabaseAdapter.
-//
-// 现 Phase 2: IDB only. Phase 3 page rewrite 后 + Phase 5 community adapter PR.
-
 import { isCanon } from "../kimi-mode";
 import { idbAdapter } from "./idb-adapter";
+import { supabaseAdapter } from "./supabase-adapter";
 import type { AdapterBundle } from "./types";
 
-// canon path placeholder · Phase 3 真 wire.
-// 现 Phase 2 即使 canon 也 fall through IDB (canon prod 没 page 调 useStore 还,
-// 所以 不影响). Phase 3 加 CanonPrismaAdapter 时 此 switch 启用.
 function selectAdapter(): AdapterBundle {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return supabaseAdapter;
+  }
   if (isCanon) {
-    // TODO Phase 3: return canonPrismaAdapter
     return idbAdapter;
   }
   return idbAdapter;
@@ -26,7 +19,6 @@ export function getAdapter(): AdapterBundle {
   return _bundle;
 }
 
-// Convenience hooks · page 调.
 export const keepsakeStore = () => getAdapter().keepsake;
 export const pieceStore = () => getAdapter().piece;
 export const bookStore = () => getAdapter().book;
