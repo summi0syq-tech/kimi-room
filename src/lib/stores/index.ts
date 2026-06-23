@@ -1,12 +1,8 @@
 import { isCanon } from "../kimi-mode";
 import { idbAdapter } from "./idb-adapter";
-import { supabaseAdapter } from "./supabase-adapter";
 import type { AdapterBundle } from "./types";
 
 function selectAdapter(): AdapterBundle {
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return supabaseAdapter;
-  }
   if (isCanon) {
     return idbAdapter;
   }
