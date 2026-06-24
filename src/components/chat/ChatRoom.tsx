@@ -170,35 +170,57 @@ export function ChatRoom() {
 
   // load on mount
   useEffect(() => {
-    try {
-      const lbl = localStorage.getItem(HEADER_LABEL_KEY);
-      if (lbl) setHeaderLabel(lbl);
-      const t = localStorage.getItem(THEME_KEY);
-      if (t === "day" || t === "night") setTheme(t);
-      else setTheme(autoTheme());
-      const bg = localStorage.getItem(BG_KEY);
-      if (bg) setBgId(bg);
+    (async () => {
+      try {
+        const lbl = localStorage.getItem(HEADER_LABEL_KEY);
+        if (lbl) setHeaderLabel(lbl);
+        const t = localStorage.getItem(THEME_KEY);
+        if (t === "day" || t === "night") setTheme(t);
+        else setTheme(autoTheme());
+        const bg = localStorage.getItem(BG_KEY);
+        if (bg) setBgId(bg);
 
-      // URL param: ?session=<id> → resume thread from DB; ?new=1 → fresh
-      const sessionParam = searchParams.get("session");
-      const newParam = searchParams.get("new");
+        // URL param: ?session=<id> → resume thread from DB; ?new=1 → fresh
+        const sessionParam = searchParams.get("session");
+        const newParam = searchParams.get("new");
 
-      if (newParam === "1") {
-        // brand new thread, ignore localStorage
-        setSession({
-          sessionId: `session-${Date.now()}`,
-          startedAt: new Date().toISOString(),
-          msgs: [],
-        });
-        return;
-      }
+        if (newParam === "1") {
+          // brand new thread, ignore localStorage
+          setSession({
+            sessionId: `session-${Date.now()}`,
+            startedAt: new Date().toISOString(),
+            msgs: [],
+          });
+          return;
+        }
 
-      if (sessionParam) {
-        // V2 · resume session from ChatStore IDB (canon V1 走 /api/chat/sessions)
-        void chatStore()
-          .get(sessionParam)
-          .then((d) => {
-            if (!d) return;
+        if (sessionParam) {
+          // V2 · resume session from ChatStore IDB (canon V1 走 /api/chat/sessions)
+          void chatStore()
+            .get(sessionParam)
+            .then((d) => {
+              if (!d) return;
+              const msgs: ChatMessage[] = d.messages.map((m, i) => ({
+                id: `m-${i}-${d.id}`,
+                role: m.role,
+                content: m.content,
+                ts: m.ts ?? d.createdAt,
+              }));
+              setSession({
+                sessionId: d.id,
+                startedAt: d.createdAt,
+                msgs,
+              });
+            })
+            .catch(() => {});
+          return;
+        }
+
+        // default: 先从 Supabase 读最新的 session
+        try {
+          const sessions = await chatStore().list({ limit: 1 });
+          if (sessions && sessions.length > 0) {
+            const d = sessions[0];
             const msgs: ChatMessage[] = d.messages.map((m, i) => ({
               id: `m-${i}-${d.id}`,
               role: m.role,
@@ -210,18 +232,18 @@ export function ChatRoom() {
               startedAt: d.createdAt,
               msgs,
             });
-          })
-          .catch(() => {});
-        return;
-      }
+            return;
+          }
+        } catch {}
 
-      // default: resume from localStorage
-      const ses = localStorage.getItem(SESSION_KEY);
-      if (ses) {
-        const parsed = JSON.parse(ses) as SessionState;
-        if (parsed?.msgs?.length) setSession(parsed);
-      }
-    } catch {}
+        // fallback: 云端没有再用本地
+        const ses = localStorage.getItem(SESSION_KEY);
+        if (ses) {
+          const parsed = JSON.parse(ses) as SessionState;
+          if (parsed?.msgs?.length) setSession(parsed);
+        }
+      } catch {}
+    })();
   }, [searchParams]);
 
   // persist
