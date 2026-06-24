@@ -118,7 +118,7 @@ const blobContract: BlobContract = {
       kind: blob.kind,
       contentType: blob.contentType,
       base64: blob.base64,
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
     const { error } = await getClient().from("blob").upsert(full);
     if (error) throw error;
