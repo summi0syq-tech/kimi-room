@@ -38,8 +38,9 @@ function applyFilter<T extends StoreEntry>(rows: T[], filter?: Filter): T[] {
     out = out.filter((r) => (r as { active?: boolean }).active !== false);
   }
   if (filter.dateRange) {
-    out = out.filter((r) => {
+        out = out.filter((r) => {
       const d = (r as { date?: string }).date ?? (r as { created_at?: string }).created_at;
+      if (!d) return false;
       return d >= filter.dateRange!.from && d <= filter.dateRange!.to;
     });
   }
