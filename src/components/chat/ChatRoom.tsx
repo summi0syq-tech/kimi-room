@@ -292,7 +292,7 @@ export function ChatRoom() {
           note: null,
           theme,
         })
-        .catch(() => {});
+        .catch((e) => console.error("Backup error:", e)); // <--- 唯一改动：输出错误
     }, 2000);
     return () => clearTimeout(t);
   }, [session, theme]);
