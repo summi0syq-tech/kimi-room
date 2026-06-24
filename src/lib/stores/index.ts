@@ -1,12 +1,11 @@
 import { isCanon } from "../kimi-mode";
 import { idbAdapter } from "./idb-adapter";
+import { supabaseAdapter } from "./supabase-adapter";
 import type { AdapterBundle } from "./types";
 
 function selectAdapter(): AdapterBundle {
-  if (isCanon) {
-    return idbAdapter;
-  }
-  return idbAdapter;
+  // 直接走 Supabase
+  return supabaseAdapter;
 }
 
 let _bundle: AdapterBundle | null = null;
