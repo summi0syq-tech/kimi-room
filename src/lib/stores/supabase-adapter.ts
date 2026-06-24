@@ -39,7 +39,7 @@ function applyFilter<T extends StoreEntry>(rows: T[], filter?: Filter): T[] {
   }
   if (filter.dateRange) {
     out = out.filter((r) => {
-      const d = (r as { date?: string }).date ?? r.createdAt;
+      const d = (r as { date?: string }).date ?? (r as { created_at?: string }).created_at;
       return d >= filter.dateRange!.from && d <= filter.dateRange!.to;
     });
   }
@@ -53,7 +53,7 @@ function makeStore<T extends StoreEntry>(tableName: string): StoreContract<T> {
       const { data, error } = await getClient()
         .from(tableName)
         .select("*")
-        .order("createdAt", { ascending: false });
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return applyFilter(data ?? [], filter);
     },
@@ -76,8 +76,8 @@ function makeStore<T extends StoreEntry>(tableName: string): StoreContract<T> {
         ...(existing ?? {}),
         ...entry,
         id,
-        createdAt: existing?.createdAt ?? now,
-        updatedAt: now,
+        created_at: (existing as { created_at?: string })?.created_at ?? now,
+        updated_at: now,
       } as T;
       const { error } = await getClient().from(tableName).upsert(full);
       if (error) throw error;
@@ -117,7 +117,7 @@ const blobContract: BlobContract = {
       kind: blob.kind,
       contentType: blob.contentType,
       base64: blob.base64,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
     const { error } = await getClient().from("blob").upsert(full);
     if (error) throw error;
