@@ -1,0 +1,30 @@
+// kimi-room · Prisma persistence schema (reference adapter · see docs/SELF-HOST.md)
+//
+// Single uniform table for all 11 collections + blob, keyed by `collection`.
+// Single-user (1v1): the /api/store route gates every request behind an owner
+// session cookie (set by /api/auth), so there is no per-row owner column here —
+// the whole database belongs to one person.
+//
+// createdAt / updatedAt are written explicitly by the adapter layer (NOT @default
+// / @updatedAt), so timestamps survive an export→import round-trip unchanged and
+// stay byte-identical to the idb / supabase adapters.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StoreRow {
+  id         String   @id
+  collection String
+  createdAt  DateTime
+  updatedAt  DateTime
+  data       Json
+
+  @@index([collection])
+  @@map("store_rows")
+}

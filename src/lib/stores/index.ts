@@ -6,18 +6,32 @@
 // 现 Phase 2: IDB only. Phase 3 page rewrite 后 + Phase 5 community adapter PR.
 
 import { isCanon } from "../kimi-mode";
+import { coreAdapter } from "./core-adapter";
 import { idbAdapter } from "./idb-adapter";
+import { prismaAdapter } from "./prisma-adapter";
+import { supabaseAdapter } from "./supabase-adapter";
 import type { AdapterBundle } from "./types";
 
-// canon path placeholder · Phase 3 真 wire.
-// 现 Phase 2 即使 canon 也 fall through IDB (canon prod 没 page 调 useStore 还,
-// 所以 不影响). Phase 3 加 CanonPrismaAdapter 时 此 switch 启用.
+// NEXT_PUBLIC_KIMI_ADAPTER selects where dashboard data lives:
+//   "idb" (default) — in-browser IndexedDB, zero config, no backend.
+//   "supabase"      — server persistence, browser-direct + RLS (supabase-adapter).
+//   "prisma"        — server persistence via /api/store over any Postgres.
+//   "core"          — through a running kimi-core (same backend as memory/RAG).
+// The server backends load their driver lazily, so selecting idb keeps them out of
+// the runtime. canon prod wires its own adapter (Phase 3); unaffected here.
+// See docs/SELF-HOST.md.
 function selectAdapter(): AdapterBundle {
-  if (isCanon) {
-    // TODO Phase 3: return canonPrismaAdapter
-    return idbAdapter;
+  if (isCanon) return idbAdapter;
+  switch (process.env.NEXT_PUBLIC_KIMI_ADAPTER) {
+    case "supabase":
+      return supabaseAdapter;
+    case "prisma":
+      return prismaAdapter;
+    case "core":
+      return coreAdapter;
+    default:
+      return idbAdapter;
   }
-  return idbAdapter;
 }
 
 let _bundle: AdapterBundle | null = null;
