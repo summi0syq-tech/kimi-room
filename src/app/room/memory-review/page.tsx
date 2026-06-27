@@ -218,7 +218,7 @@ export default function MemoryReviewPage() {
     () =>
       [...memories]
         .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
-        .slice(0, 10)
+        .slice(0, 30)
         .map(memoryEntryToRow),
     [memories],
   );
