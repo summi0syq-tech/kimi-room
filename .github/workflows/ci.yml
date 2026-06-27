@@ -1,0 +1,21 @@
+name: ci
+# Typecheck gate for the PWA. leak-guard.yml already runs the identity allow-gate +
+# shape-layer scrub on every push/PR; this adds the build-dimension check (the same
+# `tsc --noEmit` step kimi-core's ci.yml runs). `next build` needs deploy-time env,
+# so it is exercised by the deploy, not here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install   # not `npm ci`: a single-platform lockfile can't be reliably
+                           #   completed for Linux's optional deps; npm install reconciles.
+      - run: npx tsc --noEmit

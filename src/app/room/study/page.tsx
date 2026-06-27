@@ -1,4 +1,5 @@
 import { KimiPage, KimiTopNav } from "@/components/mucha/KimiPage";
+import Link from "next/link";
 import { palGold, type KimiPalette } from "@/lib/kimi-palettes";
 import { getTheme } from "@/lib/day-theme";
 import { BookShelf } from "@/components/study/BookShelf";
@@ -30,6 +31,33 @@ export default async function StudyPage() {
       <Section label="READING" P={P}>
         <SubLabel P={P}>书架 · BOOKSHELF</SubLabel>
         <BookShelf P={P} />
+      </Section>
+
+      <Section label="PAPERS" P={P}>
+        <Link
+          href="/room/study/papers"
+          className="block"
+          style={{
+            padding: "14px 16px",
+            background: P.softAccent,
+            borderLeft: `2px solid ${P.accent}`,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+            color: P.ink,
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 15, fontFamily: '"Cormorant Garamond", "Noto Serif SC", "Songti SC", "STSong", serif', color: P.ink }}>
+              论文
+            </div>
+            <div style={{ fontSize: 10, color: P.mute, fontStyle: "italic", marginTop: 2 }}>
+              papers · 自动追踪、月度轮换
+            </div>
+          </div>
+          <span style={{ fontSize: 16, color: P.accent, fontStyle: "italic" }}>→</span>
+        </Link>
       </Section>
 
       <CategoryList P={P} />
